@@ -10,6 +10,12 @@
                 >
                     {{ tab }}
                 </li>
+                <button
+                    class="add_cart_btn_sm"
+                    :class="{ active: wall_dimensions.image_url }"
+                >
+                    Add to cart
+                </button>
             </ul>
         </div>
         <canvas height="500"></canvas>
@@ -18,47 +24,50 @@
 </template>
 
 <script>
-import { ref, provide, onMounted, watch } from "vue";
+import { ref, provide, onMounted, watch, inject } from "vue";
 
 export default {
-    props: ["dimensions"],
     setup(props, { slots }) {
         const tabTitles = ref(slots.default().map((tab) => tab.props.title));
         const activeTab = ref(tabTitles.value[0]);
         provide("activeTab", activeTab);
+        const { wall_dimensions } = inject("store");
         let canvas;
         let c;
 
         onMounted(() => {
             canvas = document.querySelector("canvas");
             c = canvas.getContext("2d");
-            canvas.width = Math.floor((props.dimensions.wall_width * 38) / 10) / 2
-            canvas.height = Math.floor((props.dimensions.wall_height * 38) / 10) / 2
+            canvas.width =
+                Math.floor((wall_dimensions.wall_width * 38) / 10) / 2;
+            canvas.height =
+                Math.floor((wall_dimensions.wall_height * 38) / 10) / 2;
         });
-        watch(props, () => {
-            if (props.dimensions.image_url) {
+        watch(wall_dimensions, () => {
+            if (wall_dimensions.image_url) {
                 let img = new Image();
                 img.onload = function () {
-                    if (props.dimensions.wallpaper_type === "photo") {
+                    if (wall_dimensions.wallpaper_type === "photo") {
                         c.clearRect(0, 0, canvas.width, canvas.height);
                         c.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    } else if (props.dimensions.wallpaper_type === "pattern") {
+                    } else if (wall_dimensions.wallpaper_type === "pattern") {
                         c.clearRect(0, 0, canvas.width, canvas.height);
                         let pattern = c.createPattern(img, "repeat");
 
                         c.fillStyle = pattern;
-                        c.fillRect(0, 0, 50,50);
-                        c.fillRect(0, 0, 50,50);
+                        c.fillRect(0, 0, 50, 50);
+                        c.fillRect(0, 0, 50, 50);
                     }
                 };
-                img.src = props.dimensions.image_url;
+                img.src = wall_dimensions.image_url;
             }
 
-                canvas.width = Math.floor((props.dimensions.wall_width * 38) / 10) / 2
-                canvas.height = Math.floor((props.dimensions.wall_height * 38) / 10) / 2
-
+            canvas.width =
+                Math.floor((wall_dimensions.wall_width * 38) / 10) / 2;
+            canvas.height =
+                Math.floor((wall_dimensions.wall_height * 38) / 10) / 2;
         });
-        return { tabTitles, activeTab };
+        return { tabTitles, activeTab, wall_dimensions };
     },
 };
 </script>
@@ -68,17 +77,26 @@ export default {
     display: flex;
     list-style-type: none;
 }
-.tabs__header li {
+.tabs__header li,
+.add_cart_btn_sm {
     padding: 0.5rem 2rem;
     background-color: white;
     color: black;
     margin: 2rem 0.2rem;
     cursor: pointer;
 }
-
+.add_cart_btn_sm {
+    border: none;
+    outline: none;
+}
 .tabs__header li.active {
     background-color: #3d8bb9;
     color: white;
+}
+.add_cart_btn_sm.active {
+    background-color: #ef233c;
+    cursor: pointer;
+    color: #fff;
 }
 canvas {
     border: 1px solid white;

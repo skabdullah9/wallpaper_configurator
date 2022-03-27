@@ -3,23 +3,16 @@
         <div v-if="total.image_uploaded" class="total">
             <p>Price breakdown:</p>
             <h4>25,24 €/m² x 6,600 m²</h4>
-            <h3>Total price: {{total.total_cost}} €</h3>
+            <h3>Total price: {{total.total_cost.toFixed(0).toLocaleString()}} €</h3>
             <small>Incl. 19% VAT</small>
         </div>
         <button class="addToCart" :class="{active : total.image_uploaded}">Add to cart</button>
     </div>
 </template>
 
-<script>
-import {watch} from 'vue'
-export default {
-  props: ['total'],
-  setup(props) {
-    watch(props, () => {
-      console.log(props)
-    })
-  }
-};
+<script setup>
+import { inject} from 'vue'
+const {total} = inject("store")
 </script>
 
 <style scoped>
