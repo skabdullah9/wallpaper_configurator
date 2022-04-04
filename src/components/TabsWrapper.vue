@@ -18,7 +18,8 @@
                 </button>
             </ul>
         </div>
-        <canvas height="500"></canvas>
+        <canvas class="main" height="500"></canvas>
+        <canvas class="second" height="500" style="display: none;"></canvas>
         <slot />
     </div>
 </template>
@@ -31,42 +32,61 @@ export default {
         const tabTitles = ref(slots.default().map((tab) => tab.props.title));
         const activeTab = ref(tabTitles.value[0]);
         provide("activeTab", activeTab);
-        const { wall_dimensions } = inject("store");
+        const { wall_dimensions, pattern_config } = inject("store");
         let canvas;
         let c;
 
         onMounted(() => {
-            canvas = document.querySelector("canvas");
+            canvas = document.querySelector("canvas.main");
             c = canvas.getContext("2d");
             canvas.width =
                 Math.floor((wall_dimensions.wall_width * 38) / 10) / 2;
             canvas.height =
                 Math.floor((wall_dimensions.wall_height * 38) / 10) / 2;
         });
-        watch(wall_dimensions, () => {
-            if (wall_dimensions.image_url) {
-                let img = new Image();
-                img.onload = function () {
-                    if (wall_dimensions.wallpaper_type === "photo") {
-                        c.clearRect(0, 0, canvas.width, canvas.height);
-                        c.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    } else if (wall_dimensions.wallpaper_type === "pattern") {
-                        c.clearRect(0, 0, canvas.width, canvas.height);
-                        let pattern = c.createPattern(img, "repeat");
 
-                        c.fillStyle = pattern;
-                        c.fillRect(0, 0, 50, 50);
-                        c.fillRect(0, 0, 50, 50);
-                    }
-                };
-                img.src = wall_dimensions.image_url;
-            }
+        watch([wall_dimensions, pattern_config], () => {
+          if (wall_dimensions.image_url) {
+            let img = new Image();
+            img.onload = function () {
+              if (wall_dimensions.wallpaper_type === "photo") {
+                c.clearRect(0, 0, canvas.width, canvas.height);
+                c.drawImage(img, 0, 0, canvas.width, canvas.height);
+              } else if (wall_dimensions.wallpaper_type === "pattern") {
+                c.clearRect(0, 0, canvas.width, canvas.height);
 
-            canvas.width =
-                Math.floor((wall_dimensions.wall_width * 38) / 10) / 2;
-            canvas.height =
-                Math.floor((wall_dimensions.wall_height * 38) / 10) / 2;
-        });
+                const secondCanvas = document.querySelector("canvas.second");
+                const secondC = secondCanvas.getContext("2d");
+                // draw img on secondC and resize it to 30px
+
+                const adjustedPatternWidth = Math.floor(
+                  (pattern_config.pattern_repeat_width /
+                    wall_dimensions.wall_width) *
+                    canvas.width
+                );
+                secondCanvas.width = adjustedPatternWidth;
+                secondCanvas.height = Math.floor(
+                  (adjustedPatternWidth / img.width) * img.height
+                );
+                secondC.drawImage(
+                  img,
+                  0,
+                  0,
+                  secondCanvas.width,
+                  secondCanvas.height
+                );
+
+                let pattern = c.createPattern(secondCanvas, "repeat");
+                c.fillStyle = pattern;
+                c.fillRect(0, 0, canvas.width, canvas.height);
+              }
+            };
+            img.src = wall_dimensions.image_url;
+          }
+
+          canvas.width = Math.floor((wall_dimensions.wall_width * 38) / 10) / 2;
+          canvas.height = Math.floor((wall_dimensions.wall_height * 38) / 10) / 2;
+        }); 
         return { tabTitles, activeTab, wall_dimensions };
     },
 };
