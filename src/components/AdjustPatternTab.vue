@@ -5,7 +5,7 @@
                         <div class="repeat_width">
                             <button
                                 id="minus_black"
-                                @click="pattern_config.pattern_repeat_width > 3.5 ? pattern_config.pattern_repeat_width -= 70 : ''"
+                                @click="pattern_config.pattern_repeat_width > 3.5 ? pattern_config.pattern_repeat_width -= 1 : ''"
                             >
                                 <img src="@/assets/minus_black.svg" alt="" />
                             </button>
@@ -16,7 +16,7 @@
                             />
                             <button
                                 id="plus_black"
-                                @click="pattern_config.pattern_repeat_width < 210 ? pattern_config.pattern_repeat_width += 70 : ''"
+                                    @click="pattern_config.pattern_repeat_width < 70 ? pattern_config.pattern_repeat_width += 1 : ''"
                             >
                                 <img src="@/assets/plus_black.svg" alt="" />
                             </button>
