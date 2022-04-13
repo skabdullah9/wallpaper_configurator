@@ -13,7 +13,7 @@ const constants = reactive({
     strip_cost: 23,
 });
 const total = reactive({
-    strips_used: 4,
+    strips_used: computed(() => Math.ceil(wall_dimensions.wall_width / 70)),
     total_cost: computed(
         () =>
             ((wall_dimensions.wall_width * wall_dimensions.wall_height) / 100) *
@@ -22,7 +22,7 @@ const total = reactive({
     image_uploaded: false,
 });
 const pattern_config = reactive({
-    pattern_repeat_width: 3.5, // min 3.5
+    pattern_repeat_width: 35, // min 3.5
     horizontal_offset_pct: 0, // ranges from -50 to +50
     vertical_offset_pct: 0, // ranges from -50 to +50
 });

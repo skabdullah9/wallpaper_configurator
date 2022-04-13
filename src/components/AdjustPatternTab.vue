@@ -41,7 +41,7 @@
                             <div>
                                 <button
                                     id="minus_black"
-                                    @click="pattern_config.vertical_offset_pct--"
+                                    @click="pattern_config.vertical_offset_pct > -50 && pattern_config.vertical_offset_pct--"
                                 >
                                     <img
                                         src="@/assets/minus_black.svg"
@@ -55,7 +55,7 @@
                                 />
                                 <button
                                     id="plus_black"
-                                    @click="pattern_config.vertical_offset_pct++"
+                                    @click="pattern_config.vertical_offset_pct < 50 && pattern_config.vertical_offset_pct++"
                                 >
                                     <img src="@/assets/plus_black.svg" alt="" />
                                 </button>
@@ -66,7 +66,7 @@
                             <div>
                                 <button
                                     id="minus_black"
-                                    @click="pattern_config.horizontal_offset_pct--"
+                                    @click="pattern_config.horizontal_offset_pct > -50 && pattern_config.horizontal_offset_pct--"
                                 >
                                     <img
                                         src="@/assets/minus_black.svg"
@@ -80,7 +80,7 @@
                                 />
                                 <button
                                     id="plus_black"
-                                    @click="pattern_config.horizontal_offset_pct++"
+                                    @click="pattern_config.horizontal_offset_pct < 50 && pattern_config.horizontal_offset_pct++"
                                 >
                                     <img src="@/assets/plus_black.svg" alt="" />
                                 </button>

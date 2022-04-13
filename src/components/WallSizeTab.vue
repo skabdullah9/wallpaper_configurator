@@ -102,7 +102,7 @@
             <p class="bold">Wallpaper dimensions:</p>
             <p>
                 Total width: {{ wall_dimensions.wall_width }} cm ({{
-                    Math.ceil(wall_dimensions.wall_width / 70)
+                    total.strips_used
                 }}
                 strips x 70cm)
             </p>
@@ -118,7 +118,7 @@
 <script setup>
 import {inject} from 'vue'
 import AddToCartBtn from './AddToCartBtn.vue'
-const {wall_dimensions} = inject("store")
+const {wall_dimensions, total} = inject("store")
 </script>
 
 <style>
