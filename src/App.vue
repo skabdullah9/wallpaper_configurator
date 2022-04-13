@@ -42,6 +42,7 @@ body {
 .container {
     max-width: 1140px;
     margin: 0 auto;
+    overflow: visible;
 }
 .flex {
     display: flex;

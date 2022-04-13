@@ -11,7 +11,7 @@
                 <div class="flex upload">
                     <div>
                         <label for="upload__image" id="upload__btn"
-                            >Upload image</label
+                            >Upload image <img src="../assets/cloud_upload.svg" alt=""></label
                         >
                         <input
                             type="file"
@@ -122,7 +122,11 @@ function getWallpaper() {
     color: white;
     padding: 1rem 3rem;
     margin-bottom: 1rem;
-    display: inline-block;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem
+
 }
 #upload__btn:hover,
 #upload__btn:focus {

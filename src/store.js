@@ -13,7 +13,7 @@ const constants = reactive({
     strip_cost: 23,
 });
 const total = reactive({
-    strips_used: computed(() => Math.ceil(wall_dimensions.wall_width / 70)),
+    strips_used: computed(() => Math.ceil((wall_dimensions.wall_width + 5) / 70)),
     total_cost: computed(
         () =>
             ((wall_dimensions.wall_width * wall_dimensions.wall_height) / 100) *

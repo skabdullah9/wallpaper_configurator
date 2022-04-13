@@ -65,7 +65,7 @@
                         id="minus_black"
                         @click="
                             wall_dimensions.wall_height > 100
-                                ? (wall_dimensions.wall_height -= 70)
+                                ? (wall_dimensions.wall_height -= 20)
                                 : ''
                         "
                     >
@@ -80,7 +80,7 @@
                         id="plus_black"
                         @click="
                             wall_dimensions.wall_height < 400
-                                ? (wall_dimensions.wall_height += 70)
+                                ? (wall_dimensions.wall_height += 20)
                                 : ''
                         "
                     >
@@ -101,14 +101,14 @@
         <div class="wallpaper_dimensions">
             <p class="bold">Wallpaper dimensions:</p>
             <p>
-                Total width: {{ wall_dimensions.wall_width }} cm ({{
+                Total width: {{ 70 * total.strips_used }} cm ({{
                     total.strips_used
                 }}
                 strips x 70cm)
             </p>
             <p>
                 Total height of each wallpaper strip:
-                {{ wall_dimensions.wall_height }} cm
+                {{ wall_dimensions.wall_height + 5 }} cm
             </p>
         </div>
         <AddToCartBtn />

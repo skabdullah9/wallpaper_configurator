@@ -11,6 +11,7 @@
           {{ tab }}
         </li>
         <button
+          id="add_cart_btn_sm"
           class="add_cart_btn_sm"
           :class="{ active: wall_dimensions.image_url }"
         >
@@ -25,7 +26,7 @@
         <canvas class="second" height="500" style="display: none"></canvas>
       </div>
 
-      <img src="../assets/lady.svg" alt="" />
+      <img class="lady-png" src="../assets/lady.svg" alt="" />
     </div>
 
     <slot />
@@ -41,29 +42,72 @@ export default {
     const activeTab = ref(tabTitles.value[0]);
     provide("activeTab", activeTab);
     const { wall_dimensions, pattern_config, total } = inject("store");
+    let cmToPx = (dimensions = 70) => Math.floor((dimensions * 38) / 9) / 2;
     let canvas;
     let c;
     let outerCanvas;
     let outerC;
     let wallpaperCopy = new Image();
+
+    const renderCanvas = () => {
+      canvas.width = cmToPx(wall_dimensions.wall_width);
+      canvas.height = cmToPx(wall_dimensions.wall_height);
+
+      outerCanvas.width = total.strips_used * cmToPx();
+      outerCanvas.height = canvas.height + 10;
+
+      const container = document.querySelector(".canvas-container");
+      const canvasContainer = document.querySelector(".canvas-container > div");
+      const ladyPNG = document.querySelector(".lady-png");
+
+      container.style.width = outerCanvas.width + "px";
+      container.style.height = outerCanvas.height + "px";
+      if(wall_dimensions.wall_width > 500) {
+        container.style.marginLeft = -total.strips_used * 1.5 +'%';
+      }
+
+      let relativeLeft =
+        canvasContainer.getBoundingClientRect().left - container.getBoundingClientRect().left;
+      ladyPNG.style.left = canvas.width + relativeLeft + "px";
+
+      renderStripLabels(outerCanvas, outerC);
+
+      c.fillStyle = "#DEDEDE";
+      c.fillRect(0, 0, canvas.width, canvas.height);
+      c.lineWidth = "2";
+      c.strokeStyle = "black";
+      c.strokeRect(0, 20, canvas.width, canvas.height - 20);
+    };
     const renderStripLabels = (canvas, c) => {
       let offset = canvas.width / total.strips_used;
       c.fillStyle = "white";
       c.fillRect(0, 0, canvas.width, 20);
+
+      c.strokeStyle = "#575651"
+      c.beginPath(); // Start a new path
+      c.moveTo(0, 20);
+      c.lineTo(canvas.width, 20); // Draw a line to
+      c.stroke();
+
+      c.beginPath(); // Start a new path
+      c.moveTo(0, canvas.height - 10);
+      c.lineTo(canvas.width, canvas.height - 10); // Draw a line to
+      c.stroke();
+
       for (let i = 1; i <= total.strips_used; i++) {
         c.strokeStyle = "black";
         c.fillStyle = "black";
         c.setLineDash([5, 3]);
         c.beginPath(); // Start a new path
-        c.moveTo(offset, 0); // Move the pen to (30, 50)
-        c.lineTo(offset, canvas.height); // Draw a line to (150, 100)
+        c.moveTo(offset, 0); // Move the pen
+        c.lineTo(offset, canvas.height); // Draw a line to
         c.stroke();
 
         c.strokeStyle = "white";
         c.setLineDash([3, 5]);
         c.beginPath(); // Start a new path
-        c.moveTo(offset, 0); // Move the pen to (30, 50)
-        c.lineTo(offset, canvas.height); // Draw a line to (150, 100)
+        c.moveTo(offset, 0); // Move the pen
+        c.lineTo(offset, canvas.height); // Draw a line to
         c.stroke();
 
         c.fillStyle = "black";
@@ -82,11 +126,7 @@ export default {
       c = canvas.getContext("2d");
       outerCanvas = document.querySelector("canvas.outer");
       outerC = outerCanvas.getContext("2d");
-      canvas.width = Math.floor((wall_dimensions.wall_width * 38) / 10) / 2;
-      canvas.height = Math.floor((wall_dimensions.wall_height * 38) / 10) / 2;
-      outerCanvas.width = canvas.width;
-      outerCanvas.height = canvas.height + 20;
-      renderStripLabels(outerCanvas, outerC);
+      renderCanvas();
     });
 
     watch([wall_dimensions, pattern_config], () => {
@@ -121,7 +161,6 @@ export default {
               secondCanvas.height
             );
 
-
             let pattern = c.createPattern(secondCanvas, "repeat");
             c.fillStyle = pattern;
 
@@ -142,11 +181,7 @@ export default {
         img.src = wall_dimensions.image_url;
       }
 
-      canvas.width = Math.floor((wall_dimensions.wall_width * 38) / 10) / 2;
-      canvas.height = Math.floor((wall_dimensions.wall_height * 38) / 10) / 2;
-      outerCanvas.width = canvas.width;
-      outerCanvas.height = canvas.height + 20;
-      renderStripLabels(outerCanvas, outerC);
+      renderCanvas();
     });
     return { tabTitles, activeTab, wall_dimensions };
   },
@@ -157,9 +192,10 @@ export default {
 .tabs__header {
   display: flex;
   list-style-type: none;
+  margin-bottom: 4rem;
 }
 .tabs__header li,
-.add_cart_btn_sm {
+#add_cart_btn_sm {
   padding: 0.5rem 2rem;
   background-color: white;
   color: black;
@@ -169,6 +205,9 @@ export default {
 .add_cart_btn_sm {
   border: none;
   outline: none;
+  padding: 0.5rem 3rem;
+  font-size: 1rem;
+  font-family: "Karla", sans-serif;
 }
 .tabs__header li.active {
   background-color: #3d8bb9;
@@ -180,13 +219,16 @@ export default {
   color: #fff;
 }
 canvas {
-  border: 1px solid white;
   display: block;
-  background-color: #ccc;
+  background-color: transparent;
 }
+
 .canvas-container > div {
   position: relative;
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: white;
+  overflow: visible;
+  width: 100%;
+  height: 100%;
 }
 canvas.outer {
   position: absolute;
@@ -194,19 +236,26 @@ canvas.outer {
   left: 0;
   z-index: 99;
   background-color: transparent;
+  border: 1px solid white;
 }
 
 .canvas-container {
   display: flex;
   align-items: end;
   justify-content: center;
-  margin: 2rem 0;
+  margin: 2rem auto;
+  /* margin-left: -10%; */
+  position: relative;
+  overflow: visible;
+
 }
+
 .canvas-container img {
   height: 350px;
-  position: relative;
-  bottom: 0.5rem;
-  left: 0rem;
+  position: absolute;
+  bottom: 0.7rem;
+  left: 0.5rem;
+  /* transform: translateX(140%); */
   -webkit-filter: drop-shadow(2px 2px 2px rgba(255, 255, 255, 0.4));
   filter: drop-shadow(3px 3px 3px rgba(255, 255, 255, 0.4))
     drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.4));
