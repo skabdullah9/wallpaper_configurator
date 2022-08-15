@@ -6,13 +6,45 @@
             <h3>Total price: {{total.total_cost.toFixed(0).toLocaleString()}} €</h3>
             <small>Incl. 19% VAT</small>
         </div>
-        <button class="addToCart" :class="{active : total.image_uploaded}">Add to cart</button>
+        <button
+          @click="handleAddToCart"
+          class="addToCart" :class="{active : total.image_uploaded}">Add to cart</button>
     </div>
 </template>
 
 <script setup>
 import { inject} from 'vue'
-const {total} = inject("store")
+const {total, wall_dimensions, pattern_config, constants} = inject("store")
+
+
+function handleAddToCart() {
+  const payload = {
+    image_url: "1",
+    wall_width: wall_dimensions.wall_width,
+    wall_height: wall_dimensions.wall_height,
+    wallpaper_type: "ab",
+    strip_width: "50",
+    strip_height: constants.strip_height,
+    strips_used: total.strips_used,
+    image_uploaded: "1",
+    pattern_repeat_width: pattern_config.pattern_repeat_width,
+    horizontal_offset_pct: pattern_config.horizontal_offset_pct,
+    vertical_offset_pct: pattern_config.vertical_offset_pct,
+  };
+
+  // POST
+  fetch(
+    "/wp-admin/admin-ajax.php?action=handle_cart_item_from_xhr",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: "payload=" + JSON.stringify(payload),
+    }
+  ).then((response) => response.json());
+}
+
 </script>
 
 <style scoped>

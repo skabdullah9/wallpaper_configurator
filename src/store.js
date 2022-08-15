@@ -32,51 +32,16 @@ const image_desc = reactive({
 });
 
 const all_images = reactive([
-        {
-            designer: "William Morris",
-            category: "forest",
-            src: require('./assets/image5.jpg'),
-        },
-        {
-            designer: "William Morris",
-            category: "mountains",
-            src: require('./assets/image1.jpg'),
-        },
-        {
-            designer: "William Morris",
-            category: "random",
-            src: require('./assets/image2.jpg'),
-        },
-        {
-            designer: "Sanderson",
-            category: "forest",
-            src: require('./assets/image6.jpg'),
-        },
-        {
-            designer: "Sanderson",
-            category: "mountains",
-            src: require('./assets/image7.jpg'),
-        },
-        {
-            designer: "Sanderson",
-            category: "random",
-            src: require('./assets/image3.jpg'),
-        },
-        {
-            designer: "Harlequin",
-            category: "forest",
-            src: require('./assets/image9.jpg'),
-        },
-        {
-            designer: "Harlequin",
-            category: "mountains",
-            src: require('./assets/image8.jpg'),
-        },
-        {
-            designer: "Harlequin",
-            category: "random",
-            src: require('./assets/image4.jpg'),
-        },
+        // {
+        //     designer: "William Morris",
+        //     category: "forest",
+        //     src: require('./assets/image5.jpg'),
+        // },
+        // {
+        //     designer: "William Morris",
+        //     category: "mountains",
+        //     src: require('./assets/image1.jpg'),
+        // },
 ])
 const default_wallpaper = reactive({
     designers_list: [...new Set(all_images.map(img => img.designer))],
