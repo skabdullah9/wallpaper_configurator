@@ -1,4 +1,4 @@
-import { reactive, computed} from "vue";
+import { reactive, computed } from "vue";
 
 const wall_dimensions = reactive({
     wall_width: 275, // min 65
@@ -6,14 +6,17 @@ const wall_dimensions = reactive({
     image_url: null,
     wallpaper_type: "photo",
 });
-const constants = reactive({
+let constants = reactive({
     strip_width: 70,
     strip_height: 245,
     price_per_meter_sq: 23,
     strip_cost: 23,
 });
+
 const total = reactive({
-    strips_used: computed(() => Math.ceil((wall_dimensions.wall_width + 5) / 70)),
+    strips_used: computed(() =>
+        Math.ceil((wall_dimensions.wall_width + 5) / 70)
+    ),
     total_cost: computed(
         () =>
             ((wall_dimensions.wall_width * wall_dimensions.wall_height) / 100) *
@@ -28,28 +31,50 @@ const pattern_config = reactive({
 });
 const image_desc = reactive({
     custom_image: null,
-    image_size: null
+    image_size: null,
 });
-
-const all_images = reactive([
-        // {
-        //     designer: "William Morris",
-        //     category: "forest",
-        //     src: require('./assets/image5.jpg'),
-        // },
-        // {
-        //     designer: "William Morris",
-        //     category: "mountains",
-        //     src: require('./assets/image1.jpg'),
-        // },
-])
-const default_wallpaper = reactive({
-    designers_list: [...new Set(all_images.map(img => img.designer))],
-    categories_list: [...new Set(all_images.map(img => img.category))],
-    designer: '',
-    category: '',
-    selected_images: computed(() => all_images.filter(img => img.category == default_wallpaper.category || img.designer == default_wallpaper.designer))
-})
-export default {
-    wall_dimensions, constants, total, pattern_config, image_desc, all_images, default_wallpaper
+async function fetchConstants() {
+    try {
+        // const response = await fetch("");
+        // const data = response?.json();
+        // constants = data;
+    } catch (error) {
+        console.log(error);
+        return;
+    }
 }
+fetchConstants();
+const all_images = reactive([
+    // {
+    //     designer: "William Morris",
+    //     category: "forest",
+    //     src: require('./assets/image5.jpg'),
+    // },
+    // {
+    //     designer: "William Morris",
+    //     category: "mountains",
+    //     src: require('./assets/image1.jpg'),
+    // },
+]);
+const default_wallpaper = reactive({
+    designers_list: [...new Set(all_images.map((img) => img.designer))],
+    categories_list: [...new Set(all_images.map((img) => img.category))],
+    designer: "",
+    category: "",
+    selected_images: computed(() =>
+        all_images.filter(
+            (img) =>
+                img.category == default_wallpaper.category ||
+                img.designer == default_wallpaper.designer
+        )
+    ),
+});
+export default {
+    wall_dimensions,
+    constants,
+    total,
+    pattern_config,
+    image_desc,
+    all_images,
+    default_wallpaper,
+};
