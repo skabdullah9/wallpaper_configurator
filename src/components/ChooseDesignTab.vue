@@ -124,7 +124,7 @@ async function getDefaultImage(src) {
     const img = await fetch(src);
     const blob = await img.blob();
     const filename =
-        src.split(".")[0].split("/")[2] + ".jpg" || "default_image.jpg";
+        src?.split(".")[0]?.split("/")[2] + ".jpg" || "default_image.jpg";
     const file = new File([blob], filename, {
         type: blob.type,
     });

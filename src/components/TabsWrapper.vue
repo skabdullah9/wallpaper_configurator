@@ -89,26 +89,34 @@ export default {
             c.strokeRect(0, 20, canvas.width, canvas.height - 20);
         };
         const renderWallpaper = () => {
-            if (wall_dimensions.image_url) {
+            if (wallpaperOffsetX.value < 0) wallpaperOffsetX.value = 0;
+            else if (wall_dimensions.image_url) {
                 let img = new Image();
                 img.classList.add("wallpaper-canvas");
                 img.onload = function () {
                     if (wall_dimensions.wallpaper_type === "photo") {
-                        const maxMove = this.width - canvas.width;
-                        if (wallpaperOffsetX.value < -10)
-                            wallpaperOffsetX.value = 0;
-                        else if (wallpaperOffsetX.value >= maxMove)
+                        const wallpaperWidth =
+                            this.width >= canvas.width
+                                ? this.width
+                                : canvas.width;
+
+                        const maxMove = Math.abs(wallpaperWidth - canvas.width);
+
+                        if (wallpaperOffsetX.value < 0)
+                            wallpaperOffsetX.value = 1;
+                        else if (wallpaperOffsetX.value >= maxMove) {
                             wallpaperOffsetX.value = maxMove;
+                        }
                         c.clearRect(0, 0, canvas.width, canvas.height);
                         c.drawImage(
                             img,
                             wallpaperOffsetX.value,
                             0,
-                            this.width,
+                            wallpaperWidth,
                             this.height,
                             0,
                             0,
-                            this.width,
+                            wallpaperWidth,
                             canvas.height
                         );
                     } else if (wall_dimensions.wallpaper_type === "pattern") {
@@ -213,21 +221,18 @@ export default {
             outerCanvas = document.querySelector("canvas.outer");
             outerC = outerCanvas.getContext("2d");
             renderCanvas();
-            let dragable = ref(false);
+
             const startX = ref(0);
             outerCanvas.addEventListener("mousedown", (e) => {
-                dragable.value = true;
                 startX.value = e.offsetX;
             });
-            outerCanvas.addEventListener("mousemove", () => {
-                if (!dragable.value) return;
-            });
+
             outerCanvas.addEventListener("mouseup", (e) => {
-                dragable.value = false;
                 const currentX = startX.value - e.offsetX;
-                if (startX.value === e.offsetX) return;
+                if (wallpaperOffsetX.value < 0) return;
                 wallpaperOffsetX.value += currentX;
             });
+
             renderWallpaper();
         });
 

@@ -35,9 +35,12 @@ const image_desc = reactive({
 });
 async function fetchConstants() {
     try {
-        // const response = await fetch("");
-        // const data = response?.json();
-        // constants = data;
+        const response = await fetch(
+            "https://wallworthy.originalpeople-dev.com/wp-admin/admin-ajax.php?action=get_wallpaper_config_constants"
+        );
+        console.log(response);
+        const data = await response.json();
+        constants = data;
     } catch (error) {
         console.log(error);
         return;
