@@ -1,12 +1,16 @@
 import { reactive, computed } from "vue";
-
+let constants = reactive({
+    strip_width: 70,
+    strip_height: 245,
+    price_per_meter_sq: 23,
+    strip_cost: 23,
+});
 const wall_dimensions = reactive({
     wall_width: 275, // min 65
     wall_height: 240, // min 100
     image_url: null,
     wallpaper_type: "photo",
 });
-let constants = reactive({});
 
 const total = reactive({
     strips_used: computed(() =>
@@ -33,18 +37,14 @@ async function fetchConstants() {
         const response = await fetch(
             "https://wallworthy.originalpeople-dev.com/wp-admin/admin-ajax.php?action=get_wallpaper_config_constants"
         );
-
         const data = await response.json();
-
-        constants = data;
+        constants.strip_width = data.strip_width
+        constants.strip_height = data.strip_height
+        constants.price_per_meter_sq = data.price_per_meter_sq
+        constants.strip_cost = data.strip_cost
     } catch (error) {
         console.log(error);
-        constants = {
-            strip_width: 70,
-            strip_height: 245,
-            price_per_meter_sq: 23,
-            strip_cost: 23,
-        };
+
     }
 }
 fetchConstants();
@@ -73,6 +73,7 @@ const default_wallpaper = reactive({
         )
     ),
 });
+
 export default {
     wall_dimensions,
     constants,
