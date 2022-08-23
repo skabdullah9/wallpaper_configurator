@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div>
         <TabsWrapper>
             <Tab title="1. Adjust wall size">
                 <WallSizeTab />
@@ -11,16 +11,15 @@
                 <AdjustPatternTab />
             </Tab>
         </TabsWrapper>
-
     </div>
 </template>
 
 <script setup>
 import TabsWrapper from "./components/TabsWrapper.vue";
 import Tab from "./components/Tab.vue";
-import WallSizeTab from './components/WallSizeTab.vue'
-import ChooseDesignTab from './components/ChooseDesignTab.vue'
-import AdjustPatternTab from './components/AdjustPatternTab.vue'
+import WallSizeTab from "./components/WallSizeTab.vue";
+import ChooseDesignTab from "./components/ChooseDesignTab.vue";
+import AdjustPatternTab from "./components/AdjustPatternTab.vue";
 </script>
 
 <style>

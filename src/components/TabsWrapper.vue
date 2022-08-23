@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="tabs">
+        <div class="container tabs">
             <ul class="tabs__header">
                 <li
                     v-for="tab in tabTitles"
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { ref, provide, onMounted, watch, inject } from "vue";
+import { ref, provide, onMounted, watch, inject, toRefs } from "vue";
 
 export default {
     setup(props, { slots }) {
@@ -46,13 +46,13 @@ export default {
         const activeTab = ref(tabTitles.value[0]);
         provide("activeTab", activeTab);
         const { wall_dimensions, pattern_config, total } = inject("store");
+        const { image_url: imageUrl } = toRefs(wall_dimensions);
         let cmToPx = (dimensions = 70) => Math.floor((dimensions * 38) / 9) / 2;
         let canvas;
         let c;
         let outerCanvas;
         let outerC;
         let img;
-        let wallpaperCopy = new Image();
         let wallpaperOffsetX = ref(0);
         let wallpaperOffsetY = ref(0);
 
@@ -71,11 +71,6 @@ export default {
 
             container.style.width = outerCanvas.width + "px";
             container.style.height = outerCanvas.height + "px";
-            if (wall_dimensions.wall_width > 500) {
-                container.style.marginLeft = -total.strips_used * 1.5 + "%";
-            } else {
-                container.style.marginLeft = "22%";
-            }
 
             let relativeLeft =
                 canvasContainer.getBoundingClientRect().left -
@@ -89,8 +84,10 @@ export default {
             c.lineWidth = "2";
             c.strokeStyle = "black";
             c.strokeRect(0, 20, canvas.width, canvas.height - 20);
+            if (imageUrl.value) handleImageUpload();
         };
         const drawWallpaper = () => {
+            if (img === undefined) return;
             const wallpaperWidth =
                 img.width >= canvas.width ? img.width : canvas.width;
             const wallpaperHeight =
@@ -119,6 +116,49 @@ export default {
                 wallpaperHeight
             );
         };
+        const handleImageUpload = () => {
+            if (wall_dimensions.wallpaper_type === "photo") {
+                requestAnimationFrame(drawWallpaper);
+            } else if (wall_dimensions.wallpaper_type === "pattern") {
+                c.clearRect(0, 0, canvas.width, canvas.height);
+
+                const secondCanvas = document.querySelector("canvas.second");
+                const secondC = secondCanvas.getContext("2d");
+                // draw img on secondC and resize it to 30px
+
+                const adjustedPatternWidth = Math.floor(
+                    (pattern_config.pattern_repeat_width /
+                        wall_dimensions.wall_width) *
+                        canvas.width
+                );
+                secondCanvas.width = adjustedPatternWidth;
+                secondCanvas.height = Math.floor(
+                    (adjustedPatternWidth / img.width) * img.height
+                );
+
+                secondC.drawImage(
+                    img,
+                    0,
+                    0,
+                    secondCanvas.width,
+                    secondCanvas.height
+                );
+
+                let pattern = c.createPattern(secondCanvas, "repeat");
+                c.fillStyle = pattern;
+
+                c.translate(
+                    pattern_config.horizontal_offset_pct * 2,
+                    pattern_config.vertical_offset_pct * 2
+                );
+                c.fillRect(
+                    -canvas.width,
+                    -canvas.height,
+                    canvas.width * 3,
+                    canvas.height * 3
+                );
+            }
+        };
         const renderWallpaper = () => {
             if (wallpaperOffsetX.value < 0) wallpaperOffsetX.value = 0;
             else if (wall_dimensions.image_url) {
@@ -126,60 +166,10 @@ export default {
                 img.classList.add("wallpaper-canvas");
 
                 img.onload = function () {
-                    if (wall_dimensions.wallpaper_type === "photo") {
-                        requestAnimationFrame(drawWallpaper);
-                    } else if (wall_dimensions.wallpaper_type === "pattern") {
-                        c.clearRect(0, 0, canvas.width, canvas.height);
-
-                        const secondCanvas =
-                            document.querySelector("canvas.second");
-                        const secondC = secondCanvas.getContext("2d");
-                        // draw img on secondC and resize it to 30px
-
-                        const adjustedPatternWidth = Math.floor(
-                            (pattern_config.pattern_repeat_width /
-                                wall_dimensions.wall_width) *
-                                canvas.width
-                        );
-                        secondCanvas.width = adjustedPatternWidth;
-                        secondCanvas.height = Math.floor(
-                            (adjustedPatternWidth / img.width) * img.height
-                        );
-
-                        secondC.drawImage(
-                            img,
-                            0,
-                            0,
-                            secondCanvas.width,
-                            secondCanvas.height
-                        );
-
-                        let pattern = c.createPattern(secondCanvas, "repeat");
-                        c.fillStyle = pattern;
-
-                        c.translate(
-                            pattern_config.horizontal_offset_pct * 2,
-                            pattern_config.vertical_offset_pct * 2
-                        );
-                        c.fillRect(
-                            -canvas.width,
-                            -canvas.height,
-                            canvas.width * 3,
-                            canvas.height * 3
-                        );
-                    }
-                    wallpaperCopy.src = canvas.toDataURL("image/jpeg");
-                    wallpaperCopy.classList.add("wallpaper-copy", "mt-10");
-                    if (!document.querySelector(".wallpaper-copy")) {
-                        // document
-                        //     .querySelector(".container")
-                        //     .appendChild(wallpaperCopy);
-                    }
+                    handleImageUpload();
                 };
                 img.src = wall_dimensions.image_url;
             }
-
-            renderCanvas();
         };
         const renderStripLabels = (canvas, c) => {
             let offset = canvas.width / total.strips_used;
@@ -230,11 +220,13 @@ export default {
             outerCanvas = document.querySelector("canvas.outer");
             outerC = outerCanvas.getContext("2d");
             renderCanvas();
+            renderWallpaper();
             const dragable = ref(false);
             const startX = ref(0);
             const startY = ref(0);
 
             outerCanvas.addEventListener("mousedown", (e) => {
+                if (wall_dimensions.wallpaper_type === "pattern") return;
                 startX.value = e.offsetX;
                 startY.value = e.offsetY;
                 dragable.value = true;
@@ -269,11 +261,14 @@ export default {
             outerCanvas.addEventListener("mouseout", () => {
                 dragable.value = false;
             });
-            renderWallpaper();
         });
 
-        watch([wall_dimensions, pattern_config], renderWallpaper);
+        watch([wall_dimensions, pattern_config], renderCanvas);
+
         watch([wallpaperOffsetX, wallpaperOffsetY], drawWallpaper);
+
+        watch(imageUrl, renderWallpaper);
+
         return { tabTitles, activeTab, wall_dimensions };
     },
 };
@@ -284,6 +279,7 @@ export default {
     display: flex;
     list-style-type: none;
     margin-bottom: 4rem;
+    padding-left: 0;
 }
 .tabs__header li,
 #add_cart_btn_sm {
@@ -320,6 +316,8 @@ canvas {
     overflow: visible;
     width: 100%;
     height: 100%;
+    display: block;
+    margin: 0 auto;
 }
 canvas.outer {
     position: absolute;
@@ -335,7 +333,6 @@ canvas.outer {
     align-items: end;
     justify-content: center;
     margin: 2rem auto;
-    /* margin-left: -10%; */
     position: relative;
     overflow: visible;
 }
@@ -345,7 +342,7 @@ canvas.outer {
     position: absolute;
     bottom: 0.7rem;
     left: 0.5rem;
-    /* transform: translateX(140%); */
+
     -webkit-filter: drop-shadow(2px 2px 2px rgba(255, 255, 255, 0.4));
     filter: drop-shadow(3px 3px 3px rgba(255, 255, 255, 0.4))
         drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.4));

@@ -1,90 +1,93 @@
 <template>
-    <p>Choose one of the designs from our collections:</p>
-    <select
-        id="select_designer"
-        v-model="default_wallpaper.designer"
-        @change="default_wallpaper.category = ''"
-    >
-        <option selected value="">By designer</option>
-        <option
-            v-for="(designer, index) in default_wallpaper.designers_list"
-            :key="index"
-            :value="designer"
+    <div class="container">
+        <p>Choose one of the designs from our collections:</p>
+        <select
+            id="select_designer"
+            v-model="default_wallpaper.designer"
+            @change="default_wallpaper.category = ''"
         >
-            {{ designer }}
-        </option>
-    </select>
-    <select
-        id="select_category"
-        v-model="default_wallpaper.category"
-        @change="default_wallpaper.designer = ''"
-    >
-        <option selected value="">By category</option>
-        <option
-            v-for="(category, index) in default_wallpaper.categories_list"
-            :key="index"
-            :value="category"
+            <option selected value="">By designer</option>
+            <option
+                v-for="(designer, index) in default_wallpaper.designers_list"
+                :key="index"
+                :value="designer"
+            >
+                {{ designer }}
+            </option>
+        </select>
+        <select
+            id="select_category"
+            v-model="default_wallpaper.category"
+            @change="default_wallpaper.designer = ''"
         >
-            {{ category }}
-        </option>
-    </select>
-    <div class="flex default-images">
-        <div
-            v-for="({ src }, index) in default_wallpaper.selected_images"
-            :key="index"
-            class="image_preview"
-        >
-            <img :src="src" alt="" @click="getWallpaper(src)" />
-        </div>
-    </div>
-    <div class="flex upload">
-        <div>
-            <label for="upload__image" id="upload__btn"
-                >Upload image <img src="../assets/cloud_upload.svg" alt=""
-            /></label>
-            <input
-                type="file"
-                id="upload__image"
-                accept="image/*"
-                @change="getWallpaper"
-            />
-            <p>
-                Upload a custom photo or image and configure it via the
-                wallpaper configurator.
-            </p>
-            <p>Accepted file formats:JPG, PNG</p>
-        </div>
-        <div class="image_info flex" v-show="wall_dimensions.image_url">
-            <div class="image_preview">
-                <img
-                    :src="wall_dimensions.image_url"
-                    id="image_preview"
-                    alt=""
-                />
+            <option selected value="">By category</option>
+            <option
+                v-for="(category, index) in default_wallpaper.categories_list"
+                :key="index"
+                :value="category"
+            >
+                {{ category }}
+            </option>
+        </select>
+        <div class="flex default-images">
+            <div
+                v-for="({ src }, index) in default_wallpaper.selected_images"
+                :key="index"
+                class="image_preview"
+            >
+                <img :src="src" alt="" @click="getWallpaper(src)" />
             </div>
+        </div>
+        <div class="flex upload">
             <div>
-                <small
-                    ><span>custom image:</span>
-                    {{ image_desc.custom_image }}</small
-                >
-                <small
-                    ><span>Price / m²:</span>
-                    {{ constants.strip_cost }} €</small
-                >
-                <small
-                    ><span>Image size: </span>
-                    {{ image_desc.image_size }}</small
-                >
-                <small
-                    ><span>Resolution: </span>
-                    {{ image_desc.custom_image }}</small
-                >
-                <small
-                    ><span>Quality: </span> {{ image_desc.custom_image }}</small
-                >
+                <label for="upload__image" id="upload__btn"
+                    >Upload image <img src="../assets/cloud_upload.svg" alt=""
+                /></label>
+                <input
+                    type="file"
+                    id="upload__image"
+                    accept="image/*"
+                    @change="getWallpaper"
+                />
+                <p>
+                    Upload a custom photo or image and configure it via the
+                    wallpaper configurator.
+                </p>
+                <p>Accepted file formats:JPG, PNG</p>
             </div>
+            <div class="image_info flex" v-show="wall_dimensions.image_url">
+                <div class="image_preview">
+                    <img
+                        :src="wall_dimensions.image_url"
+                        id="image_preview"
+                        alt=""
+                    />
+                </div>
+                <div>
+                    <small
+                        ><span>custom image:</span>
+                        {{ image_desc.custom_image }}</small
+                    >
+                    <small
+                        ><span>Price / m²:</span>
+                        {{ constants.strip_cost }} €</small
+                    >
+                    <small
+                        ><span>Image size: </span>
+                        {{ image_desc.image_size }}</small
+                    >
+                    <small
+                        ><span>Resolution: </span>
+                        {{ image_desc.custom_image }}</small
+                    >
+                    <small
+                        ><span>Quality: </span>
+                        {{ image_desc.custom_image }}</small
+                    >
+                </div>
+            </div>
+            <AddToCartBtn />
         </div>
-        <AddToCartBtn />
     </div>
 </template>
 
@@ -156,6 +159,7 @@ async function getDefaultImage(src) {
 }
 .upload {
     margin-bottom: 3rem;
+    justify-content: space-between;
 }
 .upload div:first-of-type {
     max-width: 30ch;

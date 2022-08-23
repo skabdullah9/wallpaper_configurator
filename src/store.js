@@ -38,13 +38,13 @@ async function fetchConstants() {
             "https://wallworthy.originalpeople-dev.com/wp-admin/admin-ajax.php?action=get_wallpaper_config_constants"
         );
         const data = await response.json();
-        constants.strip_width = data.strip_width
-        constants.strip_height = data.strip_height
-        constants.price_per_meter_sq = data.price_per_meter_sq
-        constants.strip_cost = data.strip_cost
+        console.log(data);
+        constants.strip_width = data.strip_width;
+        constants.strip_height = data.strip_height;
+        constants.price_per_meter_sq = data.price_per_meter_sq;
+        constants.strip_cost = data.strip_cost;
     } catch (error) {
         console.log(error);
-
     }
 }
 fetchConstants();
